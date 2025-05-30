@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>The Emerald Mountain</title>
     <style>
         body {
@@ -28,7 +28,7 @@
             background-color: #0a0a23;
             position: fixed;
             height: 100%;
-            overflow-y: scroll;
+            overflow-y: auto;
             padding: 20px 10px;
             box-shadow: 2px 0 5px rgba(0,0,0,0.5);
             transform: translateX(0);
@@ -62,18 +62,16 @@
         #main h1 {
             color: #00ccff;
         }
-        iframe {
-            width: 100%;
-            height: 80vh;
-            border: none;
-        }
         a {
             color: #00ccff;
+        }
+        #repoView {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <button id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+    <button id="sidebarToggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">☰</button>
     <div id="sidebar">
         <button onclick="showHome()">Return to Home</button>
         <div id="repoButtons">Loading repositories...</div>
@@ -82,36 +80,35 @@
         <div id="home">
             <img src="https://i.postimg.cc/fy41jCtN/Screenshot-2025-05-29-222308.png" alt="Emerald Mountain Icon" style="width:100px;height:auto;">
             <h1>The Emerald Mountain</h1>
-            <p><a href="https://www.youtube.com/@ProjectEmeraldMountain" target="_blank">Visit our YouTube</a></p>
+            <p><a href="https://www.youtube.com/@ProjectEmeraldMountain" target="_blank" rel="noopener noreferrer">Visit our YouTube</a></p>
         </div>
-        <div id="repoView" style="display:none;">
-            <iframe id="repoIframe"></iframe>
-        </div>
+        <div id="repoView"></div>
     </div>
 
     <script>
         async function loadRepos() {
-            const response = await fetch('https://api.github.com/users/tZarBomba64/repos');
-            const repos = await response.json();
             const container = document.getElementById('repoButtons');
-            container.innerHTML = '';
-            repos.forEach(repo => {
-                const btn = document.createElement('button');
-                btn.textContent = repo.name;
-                btn.onclick = () => openRepo(repo.html_url);
-                container.appendChild(btn);
-            });
+            try {
+                const response = await fetch('https://api.github.com/users/tZarBomba64/repos');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const repos = await response.json();
+                container.innerHTML = '';
+                repos.forEach(repo => {
+                    const btn = document.createElement('button');
+                    btn.textContent = repo.name;
+                    // Open repo in new tab instead of iframe
+                    btn.onclick = () => window.open(repo.html_url, '_blank', 'noopener');
+                    container.appendChild(btn);
+                });
+            } catch (error) {
+                container.innerHTML = 'Failed to load repositories.';
+                console.error('Error loading repos:', error);
+            }
         }
 
         function showHome() {
             document.getElementById('home').style.display = 'block';
             document.getElementById('repoView').style.display = 'none';
-        }
-
-        function openRepo(url) {
-            document.getElementById('repoIframe').src = url;
-            document.getElementById('home').style.display = 'none';
-            document.getElementById('repoView').style.display = 'block';
         }
 
         function toggleSidebar() {
