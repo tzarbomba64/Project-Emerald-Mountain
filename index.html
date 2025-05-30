@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Emerald Mountain</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: black url('https://i.postimg.cc/fy41jCtN/Screenshot-2025-05-29-222308.png') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+        #sidebarToggle {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+            background-color: #002244;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #sidebar {
+            width: 250px;
+            background-color: #0a0a23;
+            position: fixed;
+            height: 100%;
+            overflow-y: scroll;
+            padding: 20px 10px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        #sidebar.hidden {
+            transform: translateX(-260px);
+        }
+        #sidebar button {
+            background-color: #002244;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #sidebar button:hover {
+            background-color: #0055aa;
+        }
+        #main {
+            margin-left: 270px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+        #main.expanded {
+            margin-left: 10px;
+        }
+        #main h1 {
+            color: #00ccff;
+        }
+        iframe {
+            width: 100%;
+            height: 80vh;
+            border: none;
+        }
+        a {
+            color: #00ccff;
+        }
+    </style>
+</head>
+<body>
+    <button id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+    <div id="sidebar">
+        <button onclick="showHome()">Return to Home</button>
+        <div id="repoButtons">Loading repositories...</div>
+    </div>
+    <div id="main">
+        <div id="home">
+            <img src="https://i.postimg.cc/fy41jCtN/Screenshot-2025-05-29-222308.png" alt="Emerald Mountain Icon" style="width:100px;height:auto;">
+            <h1>The Emerald Mountain</h1>
+            <p><a href="https://www.youtube.com/@ProjectEmeraldMountain" target="_blank">Visit our YouTube</a></p>
+        </div>
+        <div id="repoView" style="display:none;">
+            <iframe id="repoIframe"></iframe>
+        </div>
+    </div>
+
+    <script>
+        async function loadRepos() {
+            const response = await fetch('https://api.github.com/users/tZarBomba64/repos');
+            const repos = await response.json();
+            const container = document.getElementById('repoButtons');
+            container.innerHTML = '';
+            repos.forEach(repo => {
+                const btn = document.createElement('button');
+                btn.textContent = repo.name;
+                btn.onclick = () => openRepo(repo.html_url);
+                container.appendChild(btn);
+            });
+        }
+
+        function showHome() {
+            document.getElementById('home').style.display = 'block';
+            document.getElementById('repoView').style.display = 'none';
+        }
+
+        function openRepo(url) {
+            document.getElementById('repoIframe').src = url;
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('repoView').style.display = 'block';
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const main = document.getElementById('main');
+            sidebar.classList.toggle('hidden');
+            main.classList.toggle('expanded');
+        }
+
+        loadRepos();
+    </script>
+</body>
+</html>
